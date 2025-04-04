@@ -10,8 +10,32 @@
 
 (function () {
     'use strict';
+    let currentURL = location.pathname, hasInit = false
 
-    window.onload = () => {
+    const observer = new MutationObserver((mutations, obs) => {
+        
+        const targetElement = document.querySelector('fieldset > :nth-child(3) > div > div:nth-of-type(2) > div:nth-of-type(1)')
+        if (targetElement) {
+            if (hasInit)
+                return
+
+            console.log("Hooking LaTeX renderer");
+            hasInit = true
+            // obs.disconnect()
+            init()
+            return
+        }
+
+        if (currentURL != location.pathname) {
+            currentURL = location.pathname
+            hasInit = false
+        }
+
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    function init() {
         const script = document.createElement('script')
         script.type = 'text/javascript'
         script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -105,7 +129,7 @@
 
         };
         
-    }
+    };
 
     function isMathJaxProcessed(element) {
         return element?.querySelector('.mjx-container') !== null;
